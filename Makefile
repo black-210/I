@@ -26,7 +26,10 @@ symlink: $(TARGET)
 test: $(TARGET)
 	@./bin/i test
 
+vsix:
+	@./scripts/package_vsix.sh
+
 clean:
 	rm -f bin/i i /tmp/i_run_* /tmp/test*
 
-.PHONY: all clean test symlink
+.PHONY: all clean test symlink vsix

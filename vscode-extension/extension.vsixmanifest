@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="i-language" Version="0.1.0" Language="en-US" Publisher="i-systems" />
+    <DisplayName>I Programming Language (Pure Binary Systems)</DisplayName>
+    <Description xml:space="preserve">Full Language Support, IntelliSense, Hover Explanations, Code Snippets, Hardware Intrinsics, and Capability Security for Language I.</Description>
+    <Tags>I,binary,systems,kernel,hardware,baremetal,dsp,security,ai</Tags>
+    <Categories>Programming Languages,Snippets,Linters</Categories>
+    <GalleryFlags>Public</GalleryFlags>
+    <License>extension/LICENSE</License>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Code"/>
+  </Installation>
+  <Dependencies/>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true" />
+    <Asset Type="Microsoft.VisualStudio.Services.Content.Details" Path="extension/README.md" Addressable="true" />
+  </Assets>
+</PackageManifest>

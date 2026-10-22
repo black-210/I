@@ -17,7 +17,14 @@ import {
   HardDrive, 
   Zap, 
   RotateCcw,
-  Sparkles
+  Sparkles,
+  Download,
+  Package,
+  Code2,
+  FileCode,
+  X,
+  ExternalLink,
+  HelpCircle
 } from 'lucide-react';
 
 const EXAMPLES = [
@@ -246,13 +253,44 @@ routine main() -> u32 {
   }
 ];
 
+const INTELLISENSE_ITEMS = [
+  { token: 'system', kind: 'Keyword', ar: 'تعريف وحدة النظام أو البرنامج الرئيسي.', en: 'Declares top-level system unit/module.' },
+  { token: 'require', kind: 'Keyword', ar: 'طلب تصريح أو قدرة أمنية صريحة للعتاد.', en: 'Requires explicit security capability.' },
+  { token: 'routine', kind: 'Declaration', ar: 'تعريف إجراء أو دالة فرعية حتمية.', en: 'Subroutine with explicit types and registers.' },
+  { token: 'kernel_entry', kind: 'Declaration', ar: 'نقطة دخول النواة والبرامج المستقلة (Bare-Metal).', en: 'Freestanding entry point without OS.' },
+  { token: 'bind', kind: 'Variable', ar: 'تعريف قيمة ثابتة رياضياً غير قابلة للتعديل.', en: 'Strictly immutable binding.' },
+  { token: 'mut', kind: 'Variable', ar: 'تعريف متغير محلي قابل للتعديل على المكدس.', en: 'Mutable stack-allocated variable.' },
+  { token: 'branch', kind: 'Control', ar: 'تفرع شرطي حتمي (بديل if).', en: 'Conditional branch (CMP + JZ/JNZ).' },
+  { token: 'otherwise', kind: 'Control', ar: 'المسار البديل للتفرع (بديل else).', en: 'Else block for branch.' },
+  { token: 'cycle', kind: 'Loop', ar: 'حلقة تكرار محددة البداية والنهاية والخطوة.', en: 'Cycle loop with explicit bounds & step.' },
+  { token: 'repeat', kind: 'Loop', ar: 'حلقة تكرار مستمرة حتى تحقق شرط until.', en: 'Repeat-until loop.' },
+  { token: 'yield', kind: 'Control', ar: 'إرجاع القيمة في سجل RAX وتنفيذ RET.', en: 'Return value in RAX register.' },
+  { token: 'halt', kind: 'Instruction', ar: 'تعليمة إيقاف المعالج HLT (0xF4).', en: 'Emits x86 HLT instruction.' },
+  { token: 'trap', kind: 'Instruction', ar: 'إطلاق فخ برمجي عتادي فوري UD2 (0x0F 0x0B).', en: 'Emits x86 UD2 trap instruction.' },
+  { token: 'verify', kind: 'Contract', ar: 'فحص عقد منطقي ثابت في وقت الترجمة (Static Assert).', en: 'Compile-time assertion.' },
+  { token: 'layout', kind: 'Type', ar: 'تخطيط ثنائي محزوم مع إزاحات دقيقة بالبايت.', en: 'Packed binary struct with explicit byte offsets.' },
+  { token: '+!', kind: 'Operator', ar: 'جمع مفحوص: فخ فوري عند تجاوز السعة (Checked).', en: 'Checked addition (Trap on overflow).' },
+  { token: '+%', kind: 'Operator', ar: 'جمع متسلسل دوري: التفاف دوري معياري (Wrapping).', en: 'Modular wrapping addition.' },
+  { token: '+?', kind: 'Operator', ar: 'جمع إشباعي: يلتصق بالحد الأقصى (Saturating).', en: 'Saturating addition (Clamped at limit).' },
+  { token: '<<<', kind: 'Operator', ar: 'تدوير دائري لليسار (x86 ROL).', en: 'Bitwise circular rotate left.' },
+  { token: '>>>', kind: 'Operator', ar: 'تدوير دائري لليمين (x86 ROR).', en: 'Bitwise circular rotate right.' },
+  { token: '@out8', kind: 'Intrinsic', ar: 'إرسال بايت لمنفذ إدخال/إخراج (OUT DX, AL).', en: 'Write byte to hardware I/O port.' },
+  { token: '@in8', kind: 'Intrinsic', ar: 'قراءة بايت من منفذ إدخال/إخراج (IN AL, DX).', en: 'Read byte from hardware I/O port.' },
+  { token: '@cli', kind: 'Intrinsic', ar: 'تعطيل المقاطعات العتادية (CLI).', en: 'Disable hardware interrupts (CLI).' },
+  { token: '@sti', kind: 'Intrinsic', ar: 'تمكين المقاطعات العتادية (STI).', en: 'Enable hardware interrupts (STI).' },
+  { token: '@load32', kind: 'Intrinsic', ar: 'قراءة 32 بت من عنوان ذاكرة مباشر.', en: 'Read 32-bit word from raw pointer.' },
+  { token: '@store32', kind: 'Intrinsic', ar: 'كتابة 32 بت في عنوان ذاكرة مباشر.', en: 'Write 32-bit word to raw pointer.' },
+  { token: '@syscall', kind: 'Intrinsic', ar: 'نداء مباشر لنواة لينكس (SYSCALL 0x0F 0x05).', en: 'Invoke Linux kernel direct syscall.' }
+];
+
 export default function App() {
   const [selectedExample, setSelectedExample] = useState(EXAMPLES[1]);
   const [code, setCode] = useState(EXAMPLES[1].code);
   const [terminalOutput, setTerminalOutput] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'terminal' | 'bitstream' | 'disasm' | 'specs'>('terminal');
   const [lastCmd, setLastCmd] = useState<string>('./bin/i inspect');
+  const [showVsixModal, setShowVsixModal] = useState<boolean>(false);
+  const [filterQuery, setFilterQuery] = useState<string>('');
 
   const executeCompiler = async (cmd: string) => {
     setIsLoading(true);
@@ -283,7 +321,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Initial run on mount
     executeCompiler('inspect');
   }, []);
 
@@ -291,6 +328,12 @@ export default function App() {
     setSelectedExample(ex);
     setCode(ex.code);
   };
+
+  const filteredIntellisense = INTELLISENSE_ITEMS.filter(item => 
+    item.token.toLowerCase().includes(filterQuery.toLowerCase()) ||
+    item.ar.includes(filterQuery) ||
+    item.en.toLowerCase().includes(filterQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-[#07090e] text-[#cdd7e5] font-mono flex flex-col selection:bg-[#00f0ff] selection:text-black">
@@ -314,7 +357,25 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Download VSIX Button */}
+          <a
+            href="/api/download-vsix"
+            download="i-language-0.1.0.vsix"
+            className="flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold rounded text-xs transition cursor-pointer shadow-[0_0_12px_rgba(139,92,246,0.4)]"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download VSIX Extension</span>
+          </a>
+
+          <button
+            onClick={() => setShowVsixModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#141a29] hover:bg-[#1c253b] border border-violet-500/40 text-violet-300 rounded text-xs transition cursor-pointer"
+          >
+            <Package className="w-3.5 h-3.5" />
+            <span>IntelliSense Guide</span>
+          </button>
+
           <button
             onClick={() => executeCompiler('inspect')}
             disabled={isLoading}
@@ -389,34 +450,34 @@ export default function App() {
             })}
           </div>
 
-          {/* Target Architecture Matrix Card */}
-          <div className="p-3 bg-[#0d121f] border border-[#1b2234] rounded text-xs space-y-2">
+          {/* VSIX Quick Banner Card */}
+          <div className="p-3 bg-gradient-to-br from-violet-950/40 to-indigo-950/40 border border-violet-500/30 rounded text-xs space-y-2">
             <div className="flex items-center justify-between text-white font-bold">
-              <span className="flex items-center gap-1.5 text-xs text-slate-200">
-                <Cpu className="w-3.5 h-3.5 text-emerald-400" /> Host Backend
+              <span className="flex items-center gap-1.5 text-xs text-violet-300">
+                <Package className="w-3.5 h-3.5 text-violet-400" /> VS Code Extension
               </span>
-              <span className="text-emerald-400 text-[10px]">x86_64-linux</span>
+              <span className="text-violet-400 text-[10px] bg-violet-500/20 px-1.5 py-0.5 rounded border border-violet-500/30">
+                i-language-0.1.0.vsix
+              </span>
             </div>
-            <div className="text-[11px] text-slate-400 space-y-1">
-              <div className="flex justify-between">
-                <span>Machine Word:</span> <span className="text-slate-200">64-bit</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Endianness:</span> <span className="text-slate-200">Little-Endian</span>
-              </div>
-              <div className="flex justify-between">
-                <span>ABI Calling:</span> <span className="text-slate-200">System V AMD64</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Binary Emission:</span> <span className="text-slate-200">ELF64 / 01 Raw</span>
-              </div>
+            <p className="text-[11px] text-slate-300">
+              ملف VSIX كامل يتضمن الإكمال التلقائي الذكي IntelliSense والشروحات بالعربية والإنجليزية لكل كلمة وعملية.
+            </p>
+            <div className="flex gap-2 pt-1">
+              <a
+                href="/api/download-vsix"
+                download="i-language-0.1.0.vsix"
+                className="flex-1 text-center py-1 bg-violet-600 hover:bg-violet-500 text-white rounded text-[10px] font-semibold transition"
+              >
+                تحميل VSIX
+              </a>
+              <button
+                onClick={() => setShowVsixModal(true)}
+                className="px-2 py-1 bg-[#172033] hover:bg-[#202c45] border border-violet-500/30 text-violet-300 rounded text-[10px]"
+              >
+                عرض الدليل
+              </button>
             </div>
-            <button
-              onClick={() => executeCompiler('targets')}
-              className="w-full text-center text-[10px] text-[#00f0ff] hover:underline pt-1 cursor-pointer"
-            >
-              View Full Architecture Matrix →
-            </button>
           </div>
         </aside>
 
@@ -492,6 +553,104 @@ export default function App() {
           </div>
         </section>
       </div>
+
+      {/* VSIX Modal */}
+      {showVsixModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0e1322] border border-violet-500/40 rounded-xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-[#1b2234] flex items-center justify-between bg-[#12182b]">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded bg-violet-600/20 border border-violet-500/50 flex items-center justify-center text-violet-400 font-bold">
+                  <Package className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">إضافة Visual Studio Code الكاملة (VSIX)</h3>
+                  <p className="text-xs text-slate-400">حزمة i-language-0.1.0.vsix مع IntelliSense وتوثيق فوري</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <a
+                  href="/api/download-vsix"
+                  download="i-language-0.1.0.vsix"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white rounded text-xs font-semibold transition"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>تحميل VSIX الآن</span>
+                </a>
+                <button
+                  onClick={() => setShowVsixModal(false)}
+                  className="p-1 text-slate-400 hover:text-white rounded"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
+              <div className="p-3 bg-violet-950/30 border border-violet-500/30 rounded-lg space-y-2">
+                <h4 className="text-violet-300 font-bold flex items-center gap-2">
+                  <Code2 className="w-4 h-4" /> طريقة تثبيت إضافة VSIX في VS Code:
+                </h4>
+                <div className="bg-black/50 p-2.5 rounded font-mono text-[11px] text-slate-300">
+                  code --install-extension i-language-0.1.0.vsix
+                </div>
+                <p className="text-slate-400 text-[11px]">
+                  أو من خلال واجهة VS Code: افتح شريط الإضافات (Extensions) ← اضغط على القائمة (···) في الأعلى ← اختر <strong>Install from VSIX...</strong> ثم حدد الملف المحمل.
+                </p>
+              </div>
+
+              {/* Search Tokens */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-white font-bold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#00f0ff]" />
+                    جدول IntelliSense والشروحات التفاعلية (لا حاجة للحفظ):
+                  </h4>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={filterQuery}
+                      onChange={(e) => setFilterQuery(e.target.value)}
+                      placeholder="بحث في الكلمات والمعاملات..."
+                      className="bg-[#141b2e] border border-[#232f4e] px-2.5 py-1 text-xs rounded text-slate-200 outline-none focus:border-[#00f0ff]"
+                    />
+                  </div>
+                </div>
+
+                <div className="border border-[#1b2234] rounded-lg overflow-hidden max-h-72 overflow-y-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-[#12182b] text-slate-400 text-[10px] uppercase sticky top-0">
+                      <tr>
+                        <th className="p-2.5 border-b border-[#1b2234]">الرمز / الكلمة</th>
+                        <th className="p-2.5 border-b border-[#1b2234]">النوع</th>
+                        <th className="p-2.5 border-b border-[#1b2234]">الشرح بالعربية (ماذا يفعل المعالج)</th>
+                        <th className="p-2.5 border-b border-[#1b2234]">English Specification</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#1b2234] text-[11px]">
+                      {filteredIntellisense.map((item, idx) => (
+                        <tr key={idx} className="hover:bg-[#131b2e] transition">
+                          <td className="p-2.5 font-bold text-[#00f0ff] font-mono">{item.token}</td>
+                          <td className="p-2.5 text-slate-400">
+                            <span className="px-1.5 py-0.5 rounded bg-[#172033] border border-[#2b354f] text-[10px]">
+                              {item.kind}
+                            </span>
+                          </td>
+                          <td className="p-2.5 text-slate-300">{item.ar}</td>
+                          <td className="p-2.5 text-slate-400 font-mono text-[10px]">{item.en}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

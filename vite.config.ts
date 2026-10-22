@@ -54,6 +54,23 @@ function compilerApiPlugin(): Plugin {
           res.end('Method Not Allowed');
         }
       });
+
+      server.middlewares.use('/api/download-vsix', (req, res) => {
+        const vsixPath = path.resolve(__dirname, 'i-language-0.1.0.vsix');
+        if (fs.existsSync(vsixPath)) {
+          const stat = fs.statSync(vsixPath);
+          res.writeHead(200, {
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename="i-language-0.1.0.vsix"',
+            'Content-Length': stat.size
+          });
+          const readStream = fs.createReadStream(vsixPath);
+          readStream.pipe(res);
+        } else {
+          res.statusCode = 404;
+          res.end('VSIX file not found');
+        }
+      });
     }
   };
 }

@@ -1,0 +1,221 @@
+{
+  "System Unit Declaration": {
+    "prefix": "system",
+    "body": [
+      "system ${1:UnitName};",
+      "",
+      "require cap: ${2|host_syscall,hardware_io,raw_memory,interrupt_control,kernel_ring0|};",
+      "",
+      "routine main() -> ${3:u32} {",
+      "    ${0:// Machine instructions here}",
+      "    yield 0;",
+      "}"
+    ],
+    "description": "Declare a top-level I system unit with required hardware capabilities and main routine."
+  },
+  "Require Capability": {
+    "prefix": "require",
+    "body": [
+      "require cap: ${1|hardware_io,raw_memory,interrupt_control,kernel_ring0,host_syscall|};"
+    ],
+    "description": "Declare a compile-time security capability token required for privileged hardware operations."
+  },
+  "Routine Definition": {
+    "prefix": "routine",
+    "body": [
+      "routine ${1:routine_name}(${2:param}: ${3:u32}) -> ${4:u32} {",
+      "    ${0}",
+      "    yield ${5:0};",
+      "}"
+    ],
+    "description": "Define a deterministic routine with explicit parameter and return types."
+  },
+  "Bare-Metal Kernel Entry": {
+    "prefix": "kernel_entry",
+    "body": [
+      "kernel_entry ${1:boot_start}() -> void {",
+      "    @cli();",
+      "    ${0:// Early stage CPU initialization}",
+      "    halt;",
+      "}"
+    ],
+    "description": "Declare a freestanding kernel entry point for bare-metal execution (no OS runtime)."
+  },
+  "Immutable Binding (bind)": {
+    "prefix": "bind",
+    "body": [
+      "bind ${1:name}: ${2|u32,u8,u16,u64,i8,i16,i32,i64,b8,b16,b32,b64|}${3: = ${4:0}};"
+    ],
+    "description": "Declare an immutable value. In I, bind is strictly immutable to ensure mathematical determinism."
+  },
+  "Mutable Variable (mut)": {
+    "prefix": "mut",
+    "body": [
+      "mut ${1:name}: ${2|u32,u8,u16,u64,i8,i16,i32,i64,b8,b16,b32,b64|}${3: = ${4:0}};"
+    ],
+    "description": "Declare a mutable local variable allocated on the CPU stack."
+  },
+  "Conditional Branch": {
+    "prefix": "branch",
+    "body": [
+      "branch (${1:condition}) {",
+      "    ${2}",
+      "} otherwise {",
+      "    ${3}",
+      "}"
+    ],
+    "description": "Conditional execution branch (equivalent to if/else) with strict boolean evaluation."
+  },
+  "Cycle Loop": {
+    "prefix": "cycle",
+    "body": [
+      "cycle (mut ${1:i}: ${2:u32} = ${3:0}; ${1:i} < ${4:10}; ${1:i} = ${1:i} +% 1) {",
+      "    ${0}",
+      "}"
+    ],
+    "description": "Deterministic step-by-step cycle loop using modular wrapping (+%) arithmetic."
+  },
+  "Repeat Until Loop": {
+    "prefix": "repeat",
+    "body": [
+      "repeat {",
+      "    ${0}",
+      "} until (${1:condition});"
+    ],
+    "description": "Loop that repeats until the condition evaluates to true."
+  },
+  "Memory Layout Definition": {
+    "prefix": "layout",
+    "body": [
+      "layout ${1:LayoutName} {",
+      "    ${2:field0}: ${3:u16} @ 0x00,",
+      "    ${4:field1}: ${5:u16} @ 0x02,",
+      "    ${6:field2}: ${7:u32} @ 0x04,",
+      "}"
+    ],
+    "description": "Define a packed binary memory layout with exact byte offsets matching hardware registers or network packets."
+  },
+  "Compile-Time Verification": {
+    "prefix": "verify",
+    "body": [
+      "verify (${1:condition_const_expr});"
+    ],
+    "description": "Compile-time static assertion. Evaluated during semantic analysis; fails build if false."
+  },
+  "Hardware Port Out8 (@out8)": {
+    "prefix": "@out8",
+    "body": [
+      "@out8(${1:port_u16}, ${2:val_u8});"
+    ],
+    "description": "Emit x86 OUT DX, AL instruction. Writes 8-bit byte to hardware I/O port. Requires 'hardware_io' capability."
+  },
+  "Hardware Port In8 (@in8)": {
+    "prefix": "@in8",
+    "body": [
+      "@in8(${1:port_u16})"
+    ],
+    "description": "Emit x86 IN AL, DX instruction. Reads 8-bit byte from hardware I/O port. Requires 'hardware_io' capability."
+  },
+  "Raw Memory Load32 (@load32)": {
+    "prefix": "@load32",
+    "body": [
+      "@load32(${1:ptr_addr})"
+    ],
+    "description": "Read 32-bit unsigned word from raw memory address. Requires 'raw_memory' capability."
+  },
+  "Raw Memory Store32 (@store32)": {
+    "prefix": "@store32",
+    "body": [
+      "@store32(${1:ptr_addr}, ${2:val_u32});"
+    ],
+    "description": "Write 32-bit unsigned word to raw memory address. Requires 'raw_memory' capability."
+  },
+  "Clear Interrupts (@cli)": {
+    "prefix": "@cli",
+    "body": [
+      "@cli();"
+    ],
+    "description": "Emit x86 CLI instruction to disable CPU hardware interrupts. Requires 'interrupt_control' or 'kernel_ring0'."
+  },
+  "Set Interrupts (@sti)": {
+    "prefix": "@sti",
+    "body": [
+      "@sti();"
+    ],
+    "description": "Emit x86 STI instruction to enable CPU hardware interrupts. Requires 'interrupt_control' or 'kernel_ring0'."
+  },
+  "Halt Processor (halt)": {
+    "prefix": "halt",
+    "body": [
+      "halt;"
+    ],
+    "description": "Emit x86 HLT instruction. Suspends processor until next hardware interrupt."
+  },
+  "Direct Linux Syscall (@syscall)": {
+    "prefix": "@syscall",
+    "body": [
+      "@syscall(${1:sys_num}, ${2:arg1}, ${3:arg2}, ${4:arg3});"
+    ],
+    "description": "Invoke direct System V Linux kernel syscall instruction (0x0F 0x05). Requires 'host_syscall' capability."
+  },
+  "Software Trap / Panic (trap)": {
+    "prefix": "trap",
+    "body": [
+      "trap ${1:0x01};"
+    ],
+    "description": "Emit invalid opcode UD2 instruction to trigger immediate processor trap on critical invariant failure."
+  },
+  "Constant-Time Crypto Compare Template": {
+    "prefix": "template_crypto_const_time",
+    "body": [
+      "routine constant_time_eq8(a: u8, b: u8) -> u8 {",
+      "    bind diff: u8 = a ^ b;",
+      "    bind diff_neg: u8 = 0 -% diff;",
+      "    bind non_zero: u8 = (diff | diff_neg) >> 7;",
+      "    yield 1 ^ non_zero;",
+      "}"
+    ],
+    "description": "Constant-time byte comparison routine to eliminate timing side-channel attacks in cryptographic verification."
+  },
+  "16550 UART Serial Driver Template": {
+    "prefix": "template_uart_driver",
+    "body": [
+      "require cap: hardware_io;",
+      "",
+      "routine uart_init(port: u16) -> void {",
+      "    @out8(port +% 1, 0x00); // Disable interrupts",
+      "    @out8(port +% 3, 0x80); // Enable DLAB (baud rate divisor)",
+      "    @out8(port +% 0, 0x03); // Divisor 3 (38400 baud lo byte)",
+      "    @out8(port +% 1, 0x00); // hi byte",
+      "    @out8(port +% 3, 0x03); // 8 bits, no parity, 1 stop bit",
+      "    @out8(port +% 2, 0xC7); // Enable FIFO, clear them",
+      "}",
+      "",
+      "routine uart_putc(port: u16, ch: u8) -> void {",
+      "    @out8(port, ch);",
+      "}"
+    ],
+    "description": "Complete production-ready 16550 UART hardware serial driver template."
+  },
+  "Quantized INT8 AI GEMM Kernel": {
+    "prefix": "template_ai_gemm",
+    "body": [
+      "routine int8_dot_product_4(w0: i8, w1: i8, w2: i8, w3: i8,",
+      "                           x0: i8, x1: i8, x2: i8, x3: i8) -> i32 {",
+      "    bind p0: i32 = w0 *% x0;",
+      "    bind p1: i32 = w1 *% x1;",
+      "    bind p2: i32 = w2 *% x2;",
+      "    bind p3: i32 = w3 *% x3;",
+      "    mut sum: i32 = p0 +% p1;",
+      "    sum = sum +% p2;",
+      "    sum = sum +% p3;",
+      "    yield sum;",
+      "}",
+      "",
+      "routine relu(val: i32) -> i32 {",
+      "    branch (val > 0) { yield val; } otherwise { yield 0; }",
+      "}"
+    ],
+    "description": "Quantized INT8 neural network dot-product layer with ReLU activation."
+  }
+}

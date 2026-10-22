@@ -1,0 +1,60 @@
+{
+  "name": "i-language",
+  "displayName": "I Programming Language (Pure Binary Systems)",
+  "description": "Complete IntelliSense, Syntax Highlighting, Hardware Intrinsics, Capability Security, and Snippets for Language I",
+  "version": "0.1.0",
+  "publisher": "i-systems",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
+  "keywords": [
+    "I",
+    "binary",
+    "systems",
+    "kernel",
+    "baremetal",
+    "hardware",
+    "cybersecurity",
+    "dsp"
+  ],
+  "activationEvents": [
+    "onLanguage:i"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "i",
+        "aliases": [
+          "I",
+          "i",
+          "language-i",
+          "pure01"
+        ],
+        "extensions": [
+          ".i",
+          ".01"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "i",
+        "scopeName": "source.i",
+        "path": "./syntaxes/i.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "i",
+        "path": "./snippets/snippets.json"
+      }
+    ]
+  }
+}
