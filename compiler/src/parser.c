@@ -247,17 +247,22 @@ static Stmt *parse_statement(Parser *p) {
 
     if (match(p, TOK_KW_BIND) || match(p, TOK_KW_MUT)) {
         bool is_mut = (p->previous.type == TOK_KW_MUT);
-        consume(p, TOK_IDENT, "Expected identifier after bind/mut");
+        consume(p, TOK_IDENT, "Expected identifier after bind/let/val/mut/var");
         char name[64];
         strncpy(name, p->previous.text, sizeof(name) - 1);
 
-        consume(p, TOK_COLON, "Expected ':' after variable name");
-        consume(p, TOK_IDENT, "Expected type name");
-        DataType dt = parse_type_name(p->previous.text);
+        DataType dt;
+        if (match(p, TOK_COLON)) {
+            consume(p, TOK_IDENT, "Expected type name");
+            dt = parse_type_name(p->previous.text);
+        } else {
+            // Sensible default machine integer type for beginners (u32)
+            dt = parse_type_name("u32");
+        }
 
         consume(p, TOK_ASSIGN, "Expected '=' in variable initialization");
         Expr *init = parse_expression(p);
-        consume(p, TOK_SEMICOLON, "Expected ';' after variable declaration");
+        match(p, TOK_SEMICOLON); // Semicolon optional if at end of line
 
         Stmt *s = ast_new_stmt(is_mut ? STMT_MUT : STMT_BIND, loc);
         strncpy(s->as.decl.name, name, sizeof(s->as.decl.name) - 1);
@@ -268,9 +273,9 @@ static Stmt *parse_statement(Parser *p) {
     }
 
     if (match(p, TOK_KW_BRANCH)) {
-        consume(p, TOK_LPAREN, "Expected '(' after branch");
+        consume(p, TOK_LPAREN, "Expected '(' after branch/if");
         Expr *cond = parse_expression(p);
-        consume(p, TOK_RPAREN, "Expected ')' after branch condition");
+        consume(p, TOK_RPAREN, "Expected ')' after condition");
         Block then_blk = parse_block(p);
         bool has_else = false;
         Block else_blk = {0};
@@ -287,12 +292,31 @@ static Stmt *parse_statement(Parser *p) {
     }
 
     if (match(p, TOK_KW_CYCLE)) {
-        consume(p, TOK_LPAREN, "Expected '(' after cycle");
-        Stmt *init = parse_statement(p);
-        Expr *cond = parse_expression(p);
-        consume(p, TOK_SEMICOLON, "Expected ';' after cycle condition");
-        Stmt *step = parse_statement(p);
-        consume(p, TOK_RPAREN, "Expected ')' after cycle header");
+        consume(p, TOK_LPAREN, "Expected '(' after loop header");
+        Stmt *init = NULL;
+        Expr *cond = NULL;
+        Stmt *step = NULL;
+
+        if (check(p, TOK_KW_BIND) || check(p, TOK_KW_MUT)) {
+            init = parse_statement(p);
+            cond = parse_expression(p);
+            consume(p, TOK_SEMICOLON, "Expected ';' after cycle condition");
+            step = parse_statement(p);
+        } else {
+            // Simple while (cond)
+            cond = parse_expression(p);
+            if (match(p, TOK_SEMICOLON)) {
+                // Was cycle (expr; cond; step)
+                Expr *e_cond = parse_expression(p);
+                consume(p, TOK_SEMICOLON, "Expected ';' after cycle condition");
+                step = parse_statement(p);
+                Stmt *e_init = ast_new_stmt(STMT_EXPR, loc);
+                e_init->as.expr_stmt.expr = cond;
+                init = e_init;
+                cond = e_cond;
+            }
+        }
+        consume(p, TOK_RPAREN, "Expected ')' after loop header");
         Block body = parse_block(p);
 
         Stmt *s = ast_new_stmt(STMT_CYCLE, loc);

@@ -67,25 +67,38 @@ static Token make_token(TokenType type, const char *text, SourceLoc loc) {
 
 static TokenType match_keyword(const char *str) {
     if (strcmp(str, "system") == 0) return TOK_KW_SYSTEM;
+    if (strcmp(str, "system") == 0) return TOK_KW_SYSTEM;
     if (strcmp(str, "require") == 0) return TOK_KW_REQUIRE;
     if (strcmp(str, "cap") == 0) return TOK_KW_CAP;
     if (strcmp(str, "use") == 0) return TOK_KW_USE;
-    if (strcmp(str, "routine") == 0) return TOK_KW_ROUTINE;
+
+    // Routine / function aliases (fn, func, routine)
+    if (strcmp(str, "routine") == 0 || strcmp(str, "fn") == 0 || strcmp(str, "func") == 0) return TOK_KW_ROUTINE;
     if (strcmp(str, "kernel_entry") == 0) return TOK_KW_KERNEL_ENTRY;
-    if (strcmp(str, "bind") == 0) return TOK_KW_BIND;
-    if (strcmp(str, "mut") == 0) return TOK_KW_MUT;
-    if (strcmp(str, "branch") == 0) return TOK_KW_BRANCH;
-    if (strcmp(str, "otherwise") == 0) return TOK_KW_OTHERWISE;
-    if (strcmp(str, "cycle") == 0) return TOK_KW_CYCLE;
+
+    // Variable binding aliases (let, val, bind, mut, var)
+    if (strcmp(str, "bind") == 0 || strcmp(str, "let") == 0 || strcmp(str, "val") == 0) return TOK_KW_BIND;
+    if (strcmp(str, "mut") == 0 || strcmp(str, "var") == 0) return TOK_KW_MUT;
+
+    // Conditionals (if/else, branch/otherwise)
+    if (strcmp(str, "branch") == 0 || strcmp(str, "if") == 0) return TOK_KW_BRANCH;
+    if (strcmp(str, "otherwise") == 0 || strcmp(str, "else") == 0) return TOK_KW_OTHERWISE;
+
+    // Loops (while, for, cycle)
+    if (strcmp(str, "cycle") == 0 || strcmp(str, "while") == 0 || strcmp(str, "for") == 0) return TOK_KW_CYCLE;
     if (strcmp(str, "repeat") == 0) return TOK_KW_REPEAT;
     if (strcmp(str, "until") == 0) return TOK_KW_UNTIL;
-    if (strcmp(str, "yield") == 0) return TOK_KW_YIELD;
+
+    // Control flow (return, yield)
+    if (strcmp(str, "yield") == 0 || strcmp(str, "return") == 0) return TOK_KW_YIELD;
     if (strcmp(str, "halt") == 0) return TOK_KW_HALT;
     if (strcmp(str, "trap") == 0) return TOK_KW_TRAP;
-    if (strcmp(str, "verify") == 0) return TOK_KW_VERIFY;
+
+    // Assertions (verify, assert)
+    if (strcmp(str, "verify") == 0 || strcmp(str, "assert") == 0) return TOK_KW_VERIFY;
     if (strcmp(str, "atomic") == 0) return TOK_KW_ATOMIC;
     if (strcmp(str, "unsafe") == 0) return TOK_KW_UNSAFE;
-    if (strcmp(str, "layout") == 0) return TOK_KW_LAYOUT;
+    if (strcmp(str, "layout") == 0 || strcmp(str, "struct") == 0) return TOK_KW_LAYOUT;
     if (strcmp(str, "bitfield") == 0) return TOK_KW_BITFIELD;
     return TOK_IDENT;
 }

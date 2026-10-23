@@ -75,11 +75,23 @@ static void analyze_expr(AstProgram *prog, Scope *scope, Expr *expr) {
 
             // Capability checks
             if (strcmp(iname, "@out8") == 0 || strcmp(iname, "@in8") == 0 ||
-                strcmp(iname, "@cli") == 0 || strcmp(iname, "@sti") == 0 || strcmp(iname, "@hlt") == 0) {
+                strcmp(iname, "@out16") == 0 || strcmp(iname, "@in16") == 0 ||
+                strcmp(iname, "@out32") == 0 || strcmp(iname, "@in32") == 0 ||
+                strcmp(iname, "@cli") == 0 || strcmp(iname, "@sti") == 0 ||
+                strcmp(iname, "@hlt") == 0 || strcmp(iname, "@cpuid") == 0) {
                 if (!has_capability(prog, "hardware_io") && !has_capability(prog, "kernel_ring0")) {
                     diag_report(SEV_ERROR, "S0002", expr->loc,
                         "Hardware intrinsic '%s' requires capability 'hardware_io' or 'kernel_ring0'", iname);
                     diag_note("Add 'require cap: hardware_io;' at the top of your system unit.");
+                }
+            } else if (strcmp(iname, "@load8") == 0 || strcmp(iname, "@store8") == 0 ||
+                       strcmp(iname, "@load16") == 0 || strcmp(iname, "@store16") == 0 ||
+                       strcmp(iname, "@load32") == 0 || strcmp(iname, "@store32") == 0 ||
+                       strcmp(iname, "@load64") == 0 || strcmp(iname, "@store64") == 0) {
+                if (!has_capability(prog, "raw_memory") && !has_capability(prog, "kernel_ring0")) {
+                    diag_report(SEV_ERROR, "S0004", expr->loc,
+                        "Direct memory intrinsic '%s' requires capability 'raw_memory' or 'kernel_ring0'", iname);
+                    diag_note("Add 'require cap: raw_memory;' to declare raw memory access privilege.");
                 }
             } else if (strcmp(iname, "@syscall") == 0) {
                 if (!has_capability(prog, "host_syscall") && !has_capability(prog, "systems")) {

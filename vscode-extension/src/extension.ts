@@ -11,6 +11,72 @@ interface IntellisenseDoc {
 }
 
 const ITEMS: IntellisenseDoc[] = [
+  // --- BEGINNER FRIENDLY ALIASES ---
+  {
+    label: 'fn',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'fn <name>(<params>) -> <Type> { ... }',
+    docArabic: 'أسهل طريقة لتعريف دالة في لغة I. بديل فوري وبديهي لـ routine دون أي تعقيد.',
+    docEnglish: 'Friendly function declaration alias (routine). Clean and intuitive for all programmers.',
+    example: 'fn add(a: int, b: int) -> int {\n    return a + b;\n}'
+  },
+  {
+    label: 'let',
+    kind: vscode.CompletionItemKind.Variable,
+    detail: 'let <name> = <value>;',
+    docArabic: 'تعريف قيمة ثابتة لا تتغير (Immutable). أبسط وأوضح طريقة لتعريف الثوابت.',
+    docEnglish: 'Declares an immutable constant (alias for bind). Fast and predictable.',
+    example: 'let score = 100;'
+  },
+  {
+    label: 'var',
+    kind: vscode.CompletionItemKind.Variable,
+    detail: 'var <name> = <initial_value>;',
+    docArabic: 'تعريف متغير عادي يمكن تعديل قيمته لاحقاً (Mutable).',
+    docEnglish: 'Declares a mutable stack variable (alias for mut).',
+    example: 'var counter = 0;\ncounter = counter + 1;'
+  },
+  {
+    label: 'if',
+    kind: vscode.CompletionItemKind.Keyword,
+    detail: 'if (<condition>) { ... } else { ... }',
+    docArabic: 'جملة شرطية عادية وبديهية يعرفها كل مبرمج (بديل سهل لـ branch).',
+    docEnglish: 'Standard intuitive conditional branch statement.',
+    example: 'if (x > 10) {\n    return 1;\n} else {\n    return 0;\n}'
+  },
+  {
+    label: 'else',
+    kind: vscode.CompletionItemKind.Keyword,
+    detail: 'else { ... }',
+    docArabic: 'المسار البديل للشرط عندما يكون غير صحيح (بديل سهل لـ otherwise).',
+    docEnglish: 'Else clause for if conditional statement.',
+    example: 'if (x > 0) { return x; } else { return 0; }'
+  },
+  {
+    label: 'while',
+    kind: vscode.CompletionItemKind.Keyword,
+    detail: 'while (<condition>) { ... }',
+    docArabic: 'حلقة تكرار بسيطة تنفذ الكود طالما الشرط صحيح.',
+    docEnglish: 'Simple while loop that executes while condition remains true.',
+    example: 'while (count < 10) {\n    count = count + 1;\n}'
+  },
+  {
+    label: 'return',
+    kind: vscode.CompletionItemKind.Keyword,
+    detail: 'return <expr>;',
+    docArabic: 'إرجاع الناتج من الدالة (بديل بديهي لـ yield).',
+    docEnglish: 'Returns value from function (alias for yield).',
+    example: 'return result;'
+  },
+  {
+    label: 'int',
+    kind: vscode.CompletionItemKind.TypeParameter,
+    detail: 'int: 32-bit signed integer',
+    docArabic: 'النوع العددي الصحيح القياسي الأكثر استخداماً (32 بت).',
+    docEnglish: 'Standard 32-bit signed integer type.',
+    example: 'let age: int = 25;'
+  },
+
   // --- KEYWORDS ---
   {
     label: 'system',
@@ -275,6 +341,102 @@ const ITEMS: IntellisenseDoc[] = [
     example: 'bind status: u8 = @in8(0x3FD);'
   },
   {
+    label: '@out16',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@out16(port: u16, val: u16) -> void',
+    docArabic: 'إرسال كلمة 16 بت لمنفذ إدخال/إخراج عتادي (تعليمة OUT DX, AX).',
+    docEnglish: 'Direct x86 OUT DX, AX instruction. Writes 16-bit word to hardware port.',
+    example: '@out16(0x3F8, 0x1234);'
+  },
+  {
+    label: '@in16',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@in16(port: u16) -> u16',
+    docArabic: 'قراءة كلمة 16 بت من منفذ إدخال/إخراج عتادي (تعليمة IN AX, DX).',
+    docEnglish: 'Direct x86 IN AX, DX instruction. Reads 16-bit word from hardware port.',
+    example: 'bind word_val: u16 = @in16(0x3F8);'
+  },
+  {
+    label: '@out32',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@out32(port: u16, val: u32) -> void',
+    docArabic: 'إرسال كلمة مضاعفة 32 بت لمنفذ عتادي (OUT DX, EAX).',
+    docEnglish: 'Direct x86 OUT DX, EAX instruction. Writes 32-bit dword to hardware port.',
+    example: '@out32(0xCF8, 0x80000000); // PCI Configuration Address'
+  },
+  {
+    label: '@in32',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@in32(port: u16) -> u32',
+    docArabic: 'قراءة كلمة مضاعفة 32 بت من منفذ عتادي (IN EAX, DX).',
+    docEnglish: 'Direct x86 IN EAX, DX instruction. Reads 32-bit dword from hardware port.',
+    example: 'bind pci_data: u32 = @in32(0xCFC);'
+  },
+  {
+    label: '@load8',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@load8(ptr_addr: u64) -> u8',
+    docArabic: 'قراءة بايت واحد من عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Reads 8-bit byte directly from raw physical/virtual address.',
+    example: 'bind byte_val: u8 = @load8(0x000B8000);'
+  },
+  {
+    label: '@store8',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@store8(ptr_addr: u64, val: u8) -> void',
+    docArabic: 'كتابة بايت واحد في عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Writes 8-bit byte directly to raw physical/virtual address.',
+    example: '@store8(0x000B8000, 0x41);'
+  },
+  {
+    label: '@load16',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@load16(ptr_addr: u64) -> u16',
+    docArabic: 'قراءة كلمة 16 بت من عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Reads 16-bit word directly from raw address.',
+    example: 'bind word_val: u16 = @load16(0x000B8000);'
+  },
+  {
+    label: '@store16',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@store16(ptr_addr: u64, val: u16) -> void',
+    docArabic: 'كتابة كلمة 16 بت في عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Writes 16-bit word directly to raw address.',
+    example: '@store16(0x000B8000, 0x0F41);'
+  },
+  {
+    label: '@load32',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@load32(ptr_addr: u64) -> u32',
+    docArabic: 'قراءة كلمة 32 بت من عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Reads 32-bit integer directly from raw physical/virtual address.',
+    example: 'bind val: u32 = @load32(0x000B8000);'
+  },
+  {
+    label: '@store32',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@store32(ptr_addr: u64, val: u32) -> void',
+    docArabic: 'كتابة كلمة 32 بت في عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Writes 32-bit integer directly to raw physical/virtual address.',
+    example: '@store32(0x000B8000, 0x0F480F49);'
+  },
+  {
+    label: '@load64',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@load64(ptr_addr: u64) -> u64',
+    docArabic: 'قراءة كلمة رباعية 64 بت من عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Reads 64-bit integer directly from raw physical/virtual address.',
+    example: 'bind qword: u64 = @load64(0x00100000);'
+  },
+  {
+    label: '@store64',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@store64(ptr_addr: u64, val: u64) -> void',
+    docArabic: 'كتابة كلمة رباعية 64 بت في عنوان ذاكرة مباشر. يتطلب تصريح raw_memory.',
+    docEnglish: 'Writes 64-bit integer directly to raw physical/virtual address.',
+    example: '@store64(0x00100000, 0xDEADBEEFCAFEBABE);'
+  },
+  {
     label: '@cli',
     kind: vscode.CompletionItemKind.Method,
     detail: '@cli() -> void',
@@ -289,6 +451,22 @@ const ITEMS: IntellisenseDoc[] = [
     docArabic: 'تفعيل المقاطعات العتادية بالمعالج (تعليمة STI). يتطلب تصريح interrupt_control أو kernel_ring0.',
     docEnglish: 'Emits x86 STI instruction to set interrupt flag in EFLAGS register.',
     example: '@sti();'
+  },
+  {
+    label: '@hlt',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@hlt() -> void',
+    docArabic: 'إيقاف المعالج المؤقت بانتظار مقاطعة عتادية (تعليمة HLT).',
+    docEnglish: 'Emits x86 HLT instruction.',
+    example: '@hlt();'
+  },
+  {
+    label: '@cpuid',
+    kind: vscode.CompletionItemKind.Method,
+    detail: '@cpuid() -> void',
+    docArabic: 'استعلام عن خصائص وقدرات المعالج العتادية (تعليمة CPUID).',
+    docEnglish: 'Emits x86 CPUID instruction.',
+    example: '@cpuid();'
   },
   {
     label: '@load32',

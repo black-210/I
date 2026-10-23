@@ -23,14 +23,14 @@ DataType parse_type_name(const char *name) {
     memset(&dt, 0, sizeof(dt));
     strncpy(dt.name, name, sizeof(dt.name) - 1);
 
-    if (strcmp(name, "u8") == 0)   { dt.kind = TYPE_U8; dt.bit_width = 8; dt.is_signed = false; }
-    else if (strcmp(name, "u16") == 0) { dt.kind = TYPE_U16; dt.bit_width = 16; dt.is_signed = false; }
-    else if (strcmp(name, "u32") == 0) { dt.kind = TYPE_U32; dt.bit_width = 32; dt.is_signed = false; }
-    else if (strcmp(name, "u64") == 0) { dt.kind = TYPE_U64; dt.bit_width = 64; dt.is_signed = false; }
+    if (strcmp(name, "u8") == 0 || strcmp(name, "byte") == 0 || strcmp(name, "bool") == 0) { dt.kind = TYPE_U8; dt.bit_width = 8; dt.is_signed = false; }
+    else if (strcmp(name, "u16") == 0 || strcmp(name, "ushort") == 0) { dt.kind = TYPE_U16; dt.bit_width = 16; dt.is_signed = false; }
+    else if (strcmp(name, "u32") == 0 || strcmp(name, "uint") == 0) { dt.kind = TYPE_U32; dt.bit_width = 32; dt.is_signed = false; }
+    else if (strcmp(name, "u64") == 0 || strcmp(name, "ulong") == 0) { dt.kind = TYPE_U64; dt.bit_width = 64; dt.is_signed = false; }
     else if (strcmp(name, "i8") == 0)   { dt.kind = TYPE_I8; dt.bit_width = 8; dt.is_signed = true; }
-    else if (strcmp(name, "i16") == 0) { dt.kind = TYPE_I16; dt.bit_width = 16; dt.is_signed = true; }
-    else if (strcmp(name, "i32") == 0) { dt.kind = TYPE_I32; dt.bit_width = 32; dt.is_signed = true; }
-    else if (strcmp(name, "i64") == 0) { dt.kind = TYPE_I64; dt.bit_width = 64; dt.is_signed = true; }
+    else if (strcmp(name, "i16") == 0 || strcmp(name, "short") == 0) { dt.kind = TYPE_I16; dt.bit_width = 16; dt.is_signed = true; }
+    else if (strcmp(name, "i32") == 0 || strcmp(name, "int") == 0) { dt.kind = TYPE_I32; dt.bit_width = 32; dt.is_signed = true; }
+    else if (strcmp(name, "i64") == 0 || strcmp(name, "long") == 0) { dt.kind = TYPE_I64; dt.bit_width = 64; dt.is_signed = true; }
     else if (strcmp(name, "b8") == 0)   { dt.kind = TYPE_B8; dt.bit_width = 8; dt.is_signed = false; }
     else if (strcmp(name, "b16") == 0) { dt.kind = TYPE_B16; dt.bit_width = 16; dt.is_signed = false; }
     else if (strcmp(name, "b32") == 0) { dt.kind = TYPE_B32; dt.bit_width = 32; dt.is_signed = false; }

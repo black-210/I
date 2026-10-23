@@ -29,8 +29,65 @@ import {
 
 const EXAMPLES = [
   {
+    id: '00_easy_start',
+    name: '01. Easy Starter (3 Lines)',
+    category: 'Beginner',
+    file: 'examples/beginner/01_easy_hello.i',
+    desc: 'Simple function with let and return. Easy for anyone!',
+    code: `// Language I - Easy & Ultra-Fast!
+// Anyone can write native machine code in 3 lines.
+
+fn main() -> int {
+    let answer = 42;
+    return answer;
+}`
+  },
+  {
+    id: '00_simple_math',
+    name: '02. Easy Math & Variables',
+    category: 'Beginner',
+    file: 'examples/beginner/02_simple_math.i',
+    desc: 'let (constant), var (mutable), and clean math.',
+    code: `// Clean variables: let = constant, var = mutable
+
+fn main() -> int {
+    let base_price = 100;
+    var tax = 15;
+    var total = base_price + tax;
+
+    // Static assertion at compile-time
+    assert (100 + 15 == 115);
+
+    return total;
+}`
+  },
+  {
+    id: '00_clean_conditions',
+    name: '03. Functions & If/Else',
+    category: 'Beginner',
+    file: 'examples/beginner/03_clean_conditions.i',
+    desc: 'Intuitive functions, if/else conditions, and comparisons.',
+    code: `// Clean functions and if/else conditions
+
+fn max_value(a: int, b: int) -> int {
+    if (a > b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+fn main() -> int {
+    let x = 40;
+    let y = 70;
+    let winner = max_value(x, y);
+
+    return winner;
+}`
+  },
+  {
     id: '01_first',
-    name: '01. First Program',
+    name: '04. Systems First Program',
     category: 'Beginner',
     file: 'examples/beginner/01_first_program.i',
     desc: 'Minimal system unit, return exit code 0.',
@@ -254,6 +311,17 @@ routine main() -> u32 {
 ];
 
 const INTELLISENSE_ITEMS = [
+  // --- Beginner Friendly Aliases (Easy Mode) ---
+  { token: 'fn', kind: 'Declaration', ar: 'أبسط وأوضح طريقة لتعريف دالة (بديل سهل لـ routine).', en: 'Friendly function declaration alias (routine).' },
+  { token: 'let', kind: 'Variable', ar: 'تعريف قيمة ثابتة لا تتغير (بديل سهل لـ bind).', en: 'Clean immutable constant alias (bind).' },
+  { token: 'var', kind: 'Variable', ar: 'تعريف متغير قابل للتعديل (بديل سهل لـ mut).', en: 'Clean mutable variable alias (mut).' },
+  { token: 'if', kind: 'Control', ar: 'شرط بديهي وسهل لجميع المبرمجين (بديل branch).', en: 'Intuitive conditional if statement.' },
+  { token: 'else', kind: 'Control', ar: 'المسار البديل للشرط (بديل otherwise).', en: 'Intuitive else clause.' },
+  { token: 'while', kind: 'Loop', ar: 'حلقة تكرار بسيطة وسهلة (بديل cycle).', en: 'Simple intuitive while loop.' },
+  { token: 'return', kind: 'Control', ar: 'إرجاع القيمة من الدالة (بديل yield).', en: 'Clean return statement (yield).' },
+  { token: 'int', kind: 'Type', ar: 'عدد صحيح 32-بت قياسي وسهل (بديل i32).', en: 'Standard 32-bit signed integer alias.' },
+
+  // --- Core Systems & Hardware Constructs ---
   { token: 'system', kind: 'Keyword', ar: 'تعريف وحدة النظام أو البرنامج الرئيسي.', en: 'Declares top-level system unit/module.' },
   { token: 'require', kind: 'Keyword', ar: 'طلب تصريح أو قدرة أمنية صريحة للعتاد.', en: 'Requires explicit security capability.' },
   { token: 'routine', kind: 'Declaration', ar: 'تعريف إجراء أو دالة فرعية حتمية.', en: 'Subroutine with explicit types and registers.' },
@@ -278,8 +346,16 @@ const INTELLISENSE_ITEMS = [
   { token: '@in8', kind: 'Intrinsic', ar: 'قراءة بايت من منفذ إدخال/إخراج (IN AL, DX).', en: 'Read byte from hardware I/O port.' },
   { token: '@cli', kind: 'Intrinsic', ar: 'تعطيل المقاطعات العتادية (CLI).', en: 'Disable hardware interrupts (CLI).' },
   { token: '@sti', kind: 'Intrinsic', ar: 'تمكين المقاطعات العتادية (STI).', en: 'Enable hardware interrupts (STI).' },
+  { token: '@out16', kind: 'Intrinsic', ar: 'إرسال 16 بت لمنفذ عتادي (OUT DX, AX).', en: 'Write 16-bit word to hardware port.' },
+  { token: '@in16', kind: 'Intrinsic', ar: 'قراءة 16 بت من منفذ عتادي (IN AX, DX).', en: 'Read 16-bit word from hardware port.' },
+  { token: '@load8', kind: 'Intrinsic', ar: 'قراءة بايت واحد من عنوان ذاكرة مباشر.', en: 'Read 8-bit byte from raw pointer.' },
+  { token: '@store8', kind: 'Intrinsic', ar: 'كتابة بايت واحد في عنوان ذاكرة مباشر.', en: 'Write 8-bit byte to raw pointer.' },
   { token: '@load32', kind: 'Intrinsic', ar: 'قراءة 32 بت من عنوان ذاكرة مباشر.', en: 'Read 32-bit word from raw pointer.' },
   { token: '@store32', kind: 'Intrinsic', ar: 'كتابة 32 بت في عنوان ذاكرة مباشر.', en: 'Write 32-bit word to raw pointer.' },
+  { token: '@load64', kind: 'Intrinsic', ar: 'قراءة 64 بت من عنوان ذاكرة فيزيائي.', en: 'Read 64-bit quadword from raw pointer.' },
+  { token: '@store64', kind: 'Intrinsic', ar: 'كتابة 64 بت في عنوان ذاكرة فيزيائي.', en: 'Write 64-bit quadword to raw pointer.' },
+  { token: '@hlt', kind: 'Intrinsic', ar: 'إيقاف المعالج المؤقت بانتظار مقاطعة (HLT).', en: 'Halt processor until interrupt.' },
+  { token: '@cpuid', kind: 'Intrinsic', ar: 'الاستعلام عن إمكانيات المعالج العتادية (CPUID).', en: 'Query CPU capabilities (CPUID).' },
   { token: '@syscall', kind: 'Intrinsic', ar: 'نداء مباشر لنواة لينكس (SYSCALL 0x0F 0x05).', en: 'Invoke Linux kernel direct syscall.' }
 ];
 

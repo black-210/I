@@ -260,7 +260,6 @@ static void gen_expr(NativeBinary *bin, Expr *e) {
                 // Syscall number was first, so let's pop rax:
                 // If count was >= 1, we popped rdi... wait, let's do ordered assignments:
             } else if (strcmp(iname, "@out8") == 0) {
-                // out8(port, val)
                 gen_expr(bin, e->as.intrinsic.args[0]); // port
                 emit_u8(bin, 0x50);
                 gen_expr(bin, e->as.intrinsic.args[1]); // val
@@ -268,11 +267,50 @@ static void gen_expr(NativeBinary *bin, Expr *e) {
                 emit_u8(bin, 0x5A);                     // pop rdx (port)
                 emit_u8(bin, 0xEE);                     // out dx, al
             } else if (strcmp(iname, "@in8") == 0) {
-                // in8(port) -> al
                 gen_expr(bin, e->as.intrinsic.args[0]);
                 emit_u8(bin, 0x48); emit_u8(bin, 0x89); emit_u8(bin, 0xC2); // mov rdx, rax
                 emit_u8(bin, 0xEC);                                         // in al, dx
                 emit_u8(bin, 0x48); emit_u8(bin, 0x0F); emit_u8(bin, 0xB6); emit_u8(bin, 0xC0); // movzx rax, al
+            } else if (strcmp(iname, "@out16") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]); // port
+                emit_u8(bin, 0x50);
+                gen_expr(bin, e->as.intrinsic.args[1]); // val
+                emit_u8(bin, 0x5A);                     // pop rdx (port)
+                emit_u8(bin, 0x66); emit_u8(bin, 0xEF); // out dx, ax
+            } else if (strcmp(iname, "@in16") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]);
+                emit_u8(bin, 0x48); emit_u8(bin, 0x89); emit_u8(bin, 0xC2);
+                emit_u8(bin, 0x66); emit_u8(bin, 0xED); // in ax, dx
+                emit_u8(bin, 0x48); emit_u8(bin, 0x0F); emit_u8(bin, 0xB7); emit_u8(bin, 0xC0); // movzx rax, ax
+            } else if (strcmp(iname, "@out32") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]);
+                emit_u8(bin, 0x50);
+                gen_expr(bin, e->as.intrinsic.args[1]);
+                emit_u8(bin, 0x5A);
+                emit_u8(bin, 0xEF); // out dx, eax
+            } else if (strcmp(iname, "@in32") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]);
+                emit_u8(bin, 0x48); emit_u8(bin, 0x89); emit_u8(bin, 0xC2);
+                emit_u8(bin, 0xED); // in eax, dx
+                emit_u8(bin, 0x48); emit_u8(bin, 0x63); emit_u8(bin, 0xC0); // movsxd rax, eax
+            } else if (strcmp(iname, "@load8") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]); // ptr in rax
+                emit_u8(bin, 0x48); emit_u8(bin, 0x0F); emit_u8(bin, 0xB6); emit_u8(bin, 0x00); // movzx rax, byte ptr [rax]
+            } else if (strcmp(iname, "@store8") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]); // ptr
+                emit_u8(bin, 0x50);
+                gen_expr(bin, e->as.intrinsic.args[1]); // val
+                emit_u8(bin, 0x5F);                     // pop rdi (ptr)
+                emit_u8(bin, 0x88); emit_u8(bin, 0x07); // mov [rdi], al
+            } else if (strcmp(iname, "@load16") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]);
+                emit_u8(bin, 0x48); emit_u8(bin, 0x0F); emit_u8(bin, 0xB7); emit_u8(bin, 0x00); // movzx rax, word ptr [rax]
+            } else if (strcmp(iname, "@store16") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]);
+                emit_u8(bin, 0x50);
+                gen_expr(bin, e->as.intrinsic.args[1]);
+                emit_u8(bin, 0x5F);
+                emit_u8(bin, 0x66); emit_u8(bin, 0x89); emit_u8(bin, 0x07); // mov [rdi], ax
             } else if (strcmp(iname, "@load32") == 0) {
                 gen_expr(bin, e->as.intrinsic.args[0]); // ptr in rax
                 emit_u8(bin, 0x8B); emit_u8(bin, 0x00); // mov eax, [rax]
@@ -283,12 +321,23 @@ static void gen_expr(NativeBinary *bin, Expr *e) {
                 gen_expr(bin, e->as.intrinsic.args[1]); // val in rax
                 emit_u8(bin, 0x5F);                     // pop rdi (ptr)
                 emit_u8(bin, 0x89); emit_u8(bin, 0x07); // mov [rdi], eax
+            } else if (strcmp(iname, "@load64") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]);
+                emit_u8(bin, 0x48); emit_u8(bin, 0x8B); emit_u8(bin, 0x00); // mov rax, [rax]
+            } else if (strcmp(iname, "@store64") == 0) {
+                gen_expr(bin, e->as.intrinsic.args[0]);
+                emit_u8(bin, 0x50);
+                gen_expr(bin, e->as.intrinsic.args[1]);
+                emit_u8(bin, 0x5F);
+                emit_u8(bin, 0x48); emit_u8(bin, 0x89); emit_u8(bin, 0x07); // mov [rdi], rax
             } else if (strcmp(iname, "@cli") == 0) {
                 emit_u8(bin, 0xFA); // cli
             } else if (strcmp(iname, "@sti") == 0) {
                 emit_u8(bin, 0xFB); // sti
             } else if (strcmp(iname, "@hlt") == 0) {
                 emit_u8(bin, 0xF4); // hlt
+            } else if (strcmp(iname, "@cpuid") == 0) {
+                emit_u8(bin, 0x0F); emit_u8(bin, 0xA2); // cpuid
             }
             break;
         }
@@ -361,7 +410,7 @@ static void gen_stmt(NativeBinary *bin, Stmt *s) {
         }
 
         case STMT_CYCLE: {
-            gen_stmt(bin, s->as.cycle.init);
+            if (s->as.cycle.init) gen_stmt(bin, s->as.cycle.init);
             int loop_start = bin->size;
 
             gen_expr(bin, s->as.cycle.cond);
@@ -374,7 +423,7 @@ static void gen_stmt(NativeBinary *bin, Stmt *s) {
             for (int i = 0; i < s->as.cycle.body.count; i++) {
                 gen_stmt(bin, s->as.cycle.body.stmts[i]);
             }
-            gen_stmt(bin, s->as.cycle.step);
+            if (s->as.cycle.step) gen_stmt(bin, s->as.cycle.step);
 
             // jmp loop_start
             emit_u8(bin, 0xE9);

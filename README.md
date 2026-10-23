@@ -12,9 +12,12 @@
 [![Architecture](https://img.shields.io/badge/Target-x86__64--linux%20%7C%20baremetal-success.svg)](#)
 [![Compiler](https://img.shields.io/badge/Compiler-Native%20ELF64%20%2B%2001%20Bitstream-brightgreen.svg)](#)
 [![Documentation](https://img.shields.io/badge/Docs-Complete%20Manual%20%26%20Spec-blueviolet.svg)](docs/I_COMPLETE_REFERENCE.md)
+[![Update Guide](https://img.shields.io/badge/Update-Zero--Friction%20Ergonomics-emerald.svg)](docs/UPDATE_GUIDE.md)
 
 > 📖 **للتوثيق الكامل والشامل باللغتين العربية والإنجليزية مع كافة الأكواد والشروحات:**  
-> راجع الموسوعة الشاملة للغة في: [`docs/I_COMPLETE_REFERENCE.md`](docs/I_COMPLETE_REFERENCE.md)
+> راجع الموسوعة الشاملة للغة في: [`docs/I_COMPLETE_REFERENCE.md`](docs/I_COMPLETE_REFERENCE.md)  
+> 🚀 **للتعرف على التحديث الجديد وشرح التبسيط الذكي والتعقيد المنظم:**  
+> راجع دليل التحديث في: [`docs/UPDATE_GUIDE.md`](docs/UPDATE_GUIDE.md) | و [`CHANGELOG.md`](CHANGELOG.md)
 
 ---
 
