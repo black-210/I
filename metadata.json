@@ -1,8 +1,1 @@
-{
-  "name": "I Programming Language",
-  "description": "Pure Binary Systems Language with Native Compiler, Hardware Control, Kernel, DSP, and Cybersecurity Architecture.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}
+
